@@ -1,9 +1,13 @@
-const express = require('express');
-const app = express();
+// src/server.js
+const app = require('./app');
+const connectDB = require('./config/database')
+const dotenv = require('./config/index')
 
-app.get('/', (req, res) => {
-  res.send('Hello World');
+const PORT = process.env.PORT || 3000;
+
+// Connect to MongoDB
+connectDB();
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-app.listen(3000, () => 
-    console.log('Server is running on port 3000'));

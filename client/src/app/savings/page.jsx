@@ -1,7 +1,14 @@
 import Layout from "@/components/layout"
+import Header from "@/components/header"
 
 export default function Page(){
     return <Layout>
-        <h1>savings</h1>
+                 <Header headerName="Saving" link="/saving" linkName="Saving" />
+
+      <main>
+      {/* <GoalCart/> */}
+      {/* <NewGoalForm /> */}
+
+      </main>
     </Layout>
 }

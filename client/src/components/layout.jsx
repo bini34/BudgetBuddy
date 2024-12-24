@@ -23,7 +23,7 @@ export default function Layout({ children }) {
         <AppSidebar />
         <SidebarInset>
           <header
-            className="sticky top-0 flex justify-between h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+            className="sticky top-0 flex justify-between h-16 shrink-0 items-center gap-2 border-b bg-background px-10">
               <div className="flex items-center gap-2">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
@@ -31,7 +31,7 @@ export default function Layout({ children }) {
             </div>
             <NavUser user={data.user} />
           </header>
-          <main className="flex flex-col gap-4 p-4">
+          <main className="flex flex-col gap-4  p-10">
             {children}
           </main>
           </SidebarInset>
