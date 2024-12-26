@@ -7,6 +7,9 @@ export default function Page(){
             <Header headerName="Expense" link="/expense" linkName="Expense" />
 
             <main className="w-full flex  gap-4">
+                <div>
+                    
+                </div>
                 {/* <DataTable />
                 <ExpenseAddForm /> */}
             </main>
