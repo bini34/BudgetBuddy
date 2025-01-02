@@ -11,7 +11,7 @@ export default function IncomeCard(){
        <CardHeader>
         hjbjbhj
          </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col justify-center align-middle">
         <CardTitle>
 bbjb
         </CardTitle>

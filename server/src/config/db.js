@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 // MongoDB connection URI
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/budget-management';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/BudgetBuddy';
 
 const connectDB = async () => {
   try {
