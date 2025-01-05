@@ -1,6 +1,14 @@
+const User = require('../models/userModel');
+
 exports.createUser = async (userData) => {
-    // Logic to save user to the database
-    return 'User created in database';
+    try {
+        const user = new User(userData);
+        await user.save();
+        return 'User created in database';
+    } catch (error) {
+        console.error('Error creating user:', error);
+        throw error;
+    }
 };
 
 exports.authenticateUser = async (credentials) => {

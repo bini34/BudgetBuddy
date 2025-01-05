@@ -32,7 +32,12 @@ export function AppSidebar({
               <span className="text-md">Dashboard</span>
             </Link>
           </SidebarMenuItem>
-
+          <SidebarMenuItem>
+            <Link href="/wallet" className={isSelected('/wallet')}>
+              <Wallet className="mr-2 h-6 w-6" />
+              <span className="text-md">Wallet</span>
+            </Link>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <Link href="/budget" className={isSelected('/budget')}>
               <Wallet className="mr-2 h-6 w-6" />
@@ -55,6 +60,12 @@ export function AppSidebar({
             <Link href="/savings" className={isSelected('/savings')}>
               <PiggyBank className="mr-2 h-6 w-6" />
               <span className="text-md">Monthly Savings Goals</span>   
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link href="/loans" className={isSelected('/loans')}>
+              <BarChart className="mr-2 h-6 w-6" />
+              <span className="text-md">Loan Tracking</span>   
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>

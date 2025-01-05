@@ -9,7 +9,7 @@ router.post('/users', (req, res) => {
 // Get a specific user by ID
 router.get('/users/:id', (req, res) => {
     // Logic to get a user by ID
-    res.send(`User with ID: ${req.params.id}`);
+    res.send(`User with ID: `);
 });
 
 // Update a user's information
