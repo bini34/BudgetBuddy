@@ -1,25 +1,62 @@
 const authService = require('../services/authServices');
+const { validationResult } = require('express-validator');
+const apiResponse = require('../utils/apiResponse');
+const jwt = require('jsonwebtoken');
 
-exports.register = (req, res) => {
-    authService.register(req.body)
-        .then(result => res.send(result))
-        .catch(err => res.status(500).send(err.message));
-};
+class AuthController {
+    async register(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return apiResponse.badRequest(res, 'Validation errors', 400);
+        }
 
-exports.login = (req, res) => {
-    authService.login(req.body)
-        .then(result => res.send(result))
-        .catch(err => res.status(500).send(err.message));
-};
+        try {
+            const { name, email, password } = req.body;
+            
+            const user = await authService.register({ name, email, password });
+            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            apiResponse.created(res, { user, token }, 'User registered successfully');
+        } catch (err) {
+            apiResponse.error(res, err.message);
+        }
+    }
 
-exports.logout = (req, res) => {
-    authService.logout(req.body)
-        .then(result => res.send(result))
-        .catch(err => res.status(500).send(err.message));
-};
+    async login(req, res) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return apiResponse.badRequest(res, 'Validation errors', 400);
+        }
 
-exports.refreshToken = (req, res) => {
-    authService.refreshToken(req.body)
-        .then(result => res.send(result))
-        .catch(err => res.status(500).send(err.message));
-};
+        try {
+            const { email, password } = req.body;
+            const user = await authService.login({ email, password });
+            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+            apiResponse.success(res, { user, token }, 'Login successful');
+        } catch (err) {
+            apiResponse.unauthorized(res, err.message);
+        }
+    }
+
+    async logout(req, res) {
+        try {
+            // Invalidate the token logic here (if applicable)
+            // For example, you might add the token to a blacklist
+
+            apiResponse.success(res, null, 'User logged out');
+        } catch (err) {
+            apiResponse.error(res, err.message);
+        }
+    }
+
+    async refreshToken(req, res) {
+        try {
+            // Logic to refresh token
+            
+            apiResponse.success(res, null, 'Token refreshed');
+        } catch (err) {
+            apiResponse.error(res, err.message);
+        }
+    }
+}
+
+module.exports = new AuthController();

@@ -6,7 +6,7 @@ const loanSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  name: {
+  leanderName: {
     type: String,
     required: true, // Loan name or lender
     trim: true,
@@ -14,6 +14,11 @@ const loanSchema = new mongoose.Schema({
   amount: {
     type: Number,
     required: true,
+  },
+  status: { 
+    type: String, 
+    enum: ['Pending', 'Approved', 'Paid'], 
+    default: 'Pending' 
   },
   payoffDate: {
     type: Date, // Loan repayment due date

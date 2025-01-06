@@ -1,27 +1,17 @@
-const router = require('express').Router();
+const express = require('express');
+const authController = require('../controllers/authController');
+const { registerValidation, loginValidation, validate } = require('../validation/authValidation');
 
-// Register a new user
-router.post('/auth/register', (req, res) => {
-    // Logic to register a user
-    res.send('User registered');
-});
+// Register a new user with validation
+router.post('/auth/register', registerValidation, validate, authController.register);
 
-// Login a user
-router.post('/auth/login', (req, res) => {
-    // Logic to authenticate a user
-    res.send('User logged in');
-});
+// Login a user with validation
+router.post('/auth/login', loginValidation, validate, authController.login);
 
 // Logout a user
-router.post('/auth/logout', (req, res) => {
-    // Logic to log out a user
-    res.send('User logged out');
-});
+router.post('/auth/logout', authController.logout);
 
 // Refresh authentication token
-router.post('/auth/refresh-token', (req, res) => {
-    // Logic to refresh token
-    res.send('Token refreshed');
-});
+router.post('/auth/refresh-token', authController.refreshToken);
 
 module.exports = router;
