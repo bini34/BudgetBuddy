@@ -8,11 +8,11 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use('/api', authRoutes);
-app.use('/api', expenseRoutes);
-app.use('/api', userRoutes);
-app.use('/api', incomeRoutes);
-app.use('/api', loanRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/expense', expenseRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/loan', loanRoutes);
 
 // Simple route
 app.get('/', (req, res) => {
