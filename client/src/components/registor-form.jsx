@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label"
 import Link from "next/link"
 import { useState } from "react"
 import { Eye, EyeClosed } from "lucide-react"
+import { registerUser } from "@/lib/auth"
 
 export function RegisterForm({
   className,
@@ -14,8 +15,27 @@ export function RegisterForm({
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+
+  const handleSubmit = async (event) => {
+    console.log("name", name, "email", email, "password", password, "confirmPassword", confirmPassword);
+    event.preventDefault();
+    try {
+      const data = await registerUser(name, email, password, confirmPassword);
+      console.log(data);
+      // Handle successful registration, e.g., redirect or show a success message
+    } catch (error) {
+      console.log(error);
+      // Handle error, e.g., show an error message
+    }
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Create an account</h1>
         <p className="text-balance text-sm text-muted-foreground">
@@ -25,21 +45,20 @@ export function RegisterForm({
       <div className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="name">Full Name</Label>
-          <Input id="name" type="text" placeholder="John Doe" required />
+          <Input id="name" type="text" placeholder="John Doe"  value={name} onChange={(e) => setName(e.target.value)} />
         </div>
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" required />
+          <Input id="email" type="email" placeholder="m@example.com"  value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
         <div className="grid gap-2">
           <Label htmlFor="password">Password</Label>
           <div className="relative">
-            <Input id="password" type={showPassword ? "text" : "password"} required />
+            <Input id="password" type={showPassword ? "text" : "password"}  value={password} onChange={(e) => setPassword(e.target.value)} />
             <Button
               type="button"
-              variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              className="absolute right-2 top-1/2 -translate-y-1/2 hover:bg-inherit bg-transparent"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? (
@@ -53,18 +72,17 @@ export function RegisterForm({
         <div className="grid gap-2">
           <Label htmlFor="confirm-password">Confirm Password</Label>
           <div className="relative">
-            <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} required />
+            <Input id="confirm-password" type={showConfirmPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             <Button
               type="button"
-              variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
+              className="absolute  right-2 top-1/2 -translate-y-1/2 hover:bg-inherit bg-transparent"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? (
-                <EyeClosed className="h-4 w-4" />
+                <EyeClosed className="h-4 w-4 hover:bg-inherit" />
               ) : (
-                <Eye className="h-4 w-4" />
+                <Eye className="h-4 w-4 hover:bg-inherit" />
               )}
             </Button>
           </div>

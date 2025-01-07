@@ -1,27 +1,40 @@
-const User = require('../models/userModel');
+const User = require('../models/UserModel');
 
-exports.createUser = async (userData) => {
-    try {
-        const user = new User(userData);
-        await user.save();
-        return 'User created in database';
-    } catch (error) {
-        console.error('Error creating user:', error);
-        throw error;
+class AuthRepository {
+    async createUser(userData) {
+        try {
+            const user = new User(userData);
+            await user.save();
+            return 'User created in database';
+        } catch (error) {
+            console.error('Error creating user:', error);
+            throw error;
+        }
     }
-};
 
-exports.authenticateUser = async (credentials) => {
-    // Logic to authenticate user against the database
-    return 'User authenticated';
-};
+    async authenticateUser(credentials) {
+        const user = await User.findOne({ email });
+        if(!user){
+          return res.json({message:'Incorrect email' }) 
+        }
+        const auth = await bcrypt.compare(password,user.password)
 
-exports.logoutUser = async (data) => {
-    // Logic to handle user logout
-    return 'User logged out from database';
-};
+        if (!auth) {
+          return res.json({message:'Incorrect password' }) 
+        }
+        // Logic to authenticate user against the database
+        return user;
+    }
 
-exports.refreshUserToken = async (data) => {
-    // Logic to refresh user token
-    return 'User token refreshed';
-};
+    async logoutUser(data) {
+        // Logic to handle user logout
+        return 'User logged out from database';
+    }
+
+    async refreshUserToken(data) {
+        // Logic to refresh user token
+        return 'User token refreshed';
+    }
+}
+
+module.exports = AuthRepository;

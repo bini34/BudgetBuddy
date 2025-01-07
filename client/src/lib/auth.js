@@ -2,15 +2,28 @@
 import Fetch from "./fetch";
 
 // Function to handle user registration
-async function registerUser(email, password) {
-    const endpoint = '/api/register'; // Replace with your actual endpoint
-    return Fetch(endpoint, 'POST', { email, password });
+async function registerUser(name, email, password, confirmPassword) {
+    if (!name) {
+        throw new Error('Name is required');
+    }
+    if (!email) {
+        throw new Error('Email is required');
+    }
+    if (!password) {
+        throw new Error('Password is required');
+    }
+    if (!confirmPassword) {
+        throw new Error('Confirm password is required');
+    }
+    return Fetch('/register', 'POST', { name, email, password, confirmPassword });
 }
 
 // Function to handle user sign-in
 async function signInUser(email, password) {
-    const endpoint = '/api/signin'; // Replace with your actual endpoint
-    return Fetch(endpoint, 'POST', { email, password });
+    if (!email || !password) {
+        throw new Error('Email and password are required');
+    }
+    return Fetch('/signin', 'POST', { email, password });
 }
 
 // Function to handle password reset

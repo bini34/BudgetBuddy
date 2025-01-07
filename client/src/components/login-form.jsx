@@ -1,3 +1,4 @@
+"use client"
 import { useState } from "react";
 import { signInUser } from "@/lib/auth";
 import { cn } from "@/lib/utils"
@@ -15,12 +16,13 @@ export function LoginForm({
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const response = await signInUser(email, password);
-      // Handle successful login, e.g., redirect or show a success message
-    } catch (error) {
-      // Handle error, e.g., show an error message
-    }
+    console.log("email", email, "password", password);
+    // try {
+    //   const response = await signInUser(email, password);
+    //   // Handle successful login, e.g., redirect or show a success message
+    // } catch (error) {
+    //   // Handle error, e.g., show an error message
+    // }
   };
 
   return (
