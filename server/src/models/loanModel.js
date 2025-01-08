@@ -24,10 +24,8 @@ const loanSchema = new mongoose.Schema({
     type: Date, // Loan repayment due date
     required: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  timestamps: true
+
 });
 
 module.exports = mongoose.model('Loan', loanSchema);

@@ -15,10 +15,15 @@ const incomeSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  date: {
-    type: Date,
-    default: Date.now,
+  month: {
+    type: Number,
+    required: true,
   },
+  year: {
+    type: Number,
+    required: true,
+  },
+  timestamps: true
 });
 
 module.exports = mongoose.model('Income', incomeSchema);
