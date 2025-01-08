@@ -1,62 +1,48 @@
 const authService = require('../services/authServices');
-const { validationResult } = require('express-validator');
 const apiResponse = require('../utils/apiResponse');
-const jwt = require('jsonwebtoken');
-
 class AuthController {
     async register(req, res) {
-
-        console.log(req.body);  
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return apiResponse.badRequest(res, 'Validation errors', 400);
-        }
-
         try {
-            const { name, email, password } = req.body;
-            
-            const user = await authService.register({ name, email, password });
-            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            apiResponse.created(res, { user, token }, 'User registered successfully');
-        } catch (err) {
-            apiResponse.error(res, err.message);
+            const result = await authService.register(req.body);
+            return apiResponse.created(res, result, 'User registered successfully');
+        } catch (error) {
+            if (error.code === 11000) { // MongoDB duplicate key error
+                return apiResponse.badRequest(res, 'Email already exists');
+            }
+            if (error.name === 'ValidationError') {
+                return apiResponse.badRequest(res, error.message);
+            }
+            return apiResponse.error(res, error.message);
         }
     }
 
     async login(req, res) {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return apiResponse.badRequest(res, 'Validation errors', 400);
-        }
-
         try {
-            const { email, password } = req.body;
-            const user = await authService.login({ email, password });
-            const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            apiResponse.success(res, { user, token }, 'Login successful');
-        } catch (err) {
-            apiResponse.unauthorized(res, err.message);
+            const result = await authService.login(req.body);
+            return apiResponse.success(res, result, 'Login successful');
+        } catch (error) {
+            if (error.message === 'Incorrect email' || error.message === 'Incorrect password') {
+                return apiResponse.unauthorized(res, error.message);
+            }
+            return apiResponse.error(res, error.message);
         }
     }
 
     async logout(req, res) {
         try {
-            // Invalidate the token logic here (if applicable)
-            // For example, you might add the token to a blacklist
-
-            apiResponse.success(res, null, 'User logged out');
-        } catch (err) {
-            apiResponse.error(res, err.message);
+            const result = await authService.logout(req.body);
+            return apiResponse.success(res, result, 'Logout successful');
+        } catch (error) {
+            return apiResponse.error(res, error.message);
         }
     }
 
     async refreshToken(req, res) {
         try {
-            // Logic to refresh token
-            
-            apiResponse.success(res, null, 'Token refreshed');
-        } catch (err) {
-            apiResponse.error(res, err.message);
+            const result = await authService.refreshToken(req.body);
+            return apiResponse.success(res, result, 'Token refreshed successfully');
+        } catch (error) {
+            return apiResponse.unauthorized(res, error.message);
         }
     }
 }

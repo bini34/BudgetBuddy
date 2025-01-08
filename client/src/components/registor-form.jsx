@@ -15,17 +15,24 @@ export function RegisterForm({
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
 
   const handleSubmit = async (event) => {
-    console.log("name", name, "email", email, "password", password, "confirmPassword", confirmPassword);
+    console.log("firstName", firstName, "lastName", lastName, "email", email, "password", password, "confirmPassword", confirmPassword);
     event.preventDefault();
     try {
-      const data = await registerUser(name, email, password, confirmPassword);
+      const data = await registerUser({
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword
+      });
       console.log(data);
       // Handle successful registration, e.g., redirect or show a success message
     } catch (error) {
@@ -43,9 +50,27 @@ export function RegisterForm({
         </p>
       </div>
       <div className="grid gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Full Name</Label>
-          <Input id="name" type="text" placeholder="John Doe"  value={name} onChange={(e) => setName(e.target.value)} />
+        <div className="grid grid-cols-2 gap-4">
+          <div className="grid gap-2">
+            <Label htmlFor="firstName">First Name</Label>
+            <Input 
+              id="firstName" 
+              type="text" 
+              placeholder="John" 
+              value={firstName} 
+              onChange={(e) => setFirstName(e.target.value)} 
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input 
+              id="lastName" 
+              type="text" 
+              placeholder="Doe" 
+              value={lastName} 
+              onChange={(e) => setLastName(e.target.value)} 
+            />
+          </div>
         </div>
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>

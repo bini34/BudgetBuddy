@@ -1,21 +1,31 @@
-
 import Fetch from "./fetch";
 
 // Function to handle user registration
-async function registerUser(name, email, password, confirmPassword) {
-    if (!name) {
-        throw new Error('Name is required');
+export async function registerUser({ firstName, lastName, email, password }) {
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                password
+            }),
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Registration failed');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
     }
-    if (!email) {
-        throw new Error('Email is required');
-    }
-    if (!password) {
-        throw new Error('Password is required');
-    }
-    if (!confirmPassword) {
-        throw new Error('Confirm password is required');
-    }
-    return Fetch('/register', 'POST', { name, email, password, confirmPassword });
 }
 
 // Function to handle user sign-in

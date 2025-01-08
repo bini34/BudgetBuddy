@@ -2,6 +2,8 @@ const { body, validationResult } = require('express-validator');
 
 // Validation rules for registration
 const registerValidation = [
+    body('firstName').notEmpty().withMessage('First Name cannot be empty'),
+    body('lastName').notEmpty().withMessage('Last Name cannot be empty'),
     body('email').isEmail().withMessage('Enter a valid email address'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
 ];
