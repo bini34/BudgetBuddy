@@ -1,7 +1,7 @@
 import Fetch from "./fetch";
 
 // Function to handle user registration
-export async function registerUser({ firstName, lastName, email, password }) {
+ async function registerUser({ firstName, lastName, email, password }) {
     try {
         const response = await fetch('http://localhost:5000/api/auth/register', {
             method: 'POST',
