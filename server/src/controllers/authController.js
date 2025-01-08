@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 
 class AuthController {
     async register(req, res) {
+
+        console.log(req.body);  
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return apiResponse.badRequest(res, 'Validation errors', 400);

@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  lastName: {
     type: String,
     required: true,
     trim: true,
@@ -18,6 +23,10 @@ const userSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
     type: Date,
     default: Date.now,
   },
