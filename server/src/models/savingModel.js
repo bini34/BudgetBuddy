@@ -19,8 +19,6 @@ const savingsSchema = new mongoose.Schema({
     type: Number,
     default: 0, // Amount saved
   },
-  timestamps: true
-
-});
+}, { timestamps: { createdAt: true, updatedAt: true } });
 
 module.exports = mongoose.model('Savings', savingsSchema);

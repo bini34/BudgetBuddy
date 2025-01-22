@@ -22,8 +22,7 @@ const incomeSchema = new mongoose.Schema({
   year: {
     type: Number,
     required: true,
-  },
-  timestamps: true
-});
+  }
+}, { timestamps: { createdAt: true, updatedAt: true } });
 
 module.exports = mongoose.model('Income', incomeSchema);

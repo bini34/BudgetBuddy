@@ -29,7 +29,6 @@ const budgetSchema = new mongoose.Schema({
     year: { type: Number, required: true },
     month: { type: Number, required: true, min: 1, max: 12 }
   },
-  timestamps: true
-});
+}, { timestamps: { createdAt: true, updatedAt: true } });
 
 module.exports = mongoose.model('Budget', budgetSchema);
