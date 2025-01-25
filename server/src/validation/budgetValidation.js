@@ -199,14 +199,21 @@ const getBudgetValidation = [
 ];
 
 // Validation for getting budget by month
-const getBudgetByMonthValidation = [
-  param('year')
-    .isInt({ min: 2000, max: 2100 })
-    .withMessage('Year must be between 2000 and 2100'),
+// const getBudgetByMonthValidation = [
+//   // param('year')
+//   //   .isInt({ min: 2000, max: 2100 })
+//   //   .withMessage('Year must be between 2000 and 2100'),
 
-  param('month')
-    .isInt({ min: 1, max: 12 })
-    .withMessage('Month must be between 1 and 12'),
+//   // param('month')
+//   //   .isInt({ min: 1, max: 12 })
+//   //   .withMessage('Month must be between 1 and 12'),
+// ];
+
+const getUserBudgetCategoriesValidation = [
+  param('userId')
+    .isString()
+    .notEmpty()
+    .withMessage('User ID is required'),
 ];
 
 module.exports = {
@@ -215,6 +222,8 @@ module.exports = {
   expenseCategoryValidation,
   savingsPlanValidation,
   getBudgetValidation,
-  getBudgetByMonthValidation,
+  getUserBudgetCategoriesValidation,
   validate,
 };
+
+

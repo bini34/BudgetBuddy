@@ -1,11 +1,11 @@
 const express = require('express');
 const incomeController = require('../controllers/incomeController');
-const auth = require('../middlewares/auth');
+// const auth = require('../middlewares/auth');
 
 const router = express.Router();
 
 // Protect all routes with authentication
-router.use(auth);
+// router.use(auth);
 
 // Add income
 router.post('/', incomeController.addIncome);
