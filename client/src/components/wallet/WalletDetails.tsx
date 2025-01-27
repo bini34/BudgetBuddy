@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+// import { Progress } from "@/components/ui/progress"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ArrowUpRight, ArrowDownRight, PiggyBank } from 'lucide-react'
 
 interface WalletDetailsProps {
@@ -14,13 +14,15 @@ export function WalletDetails({ selectedWallet }: WalletDetailsProps) {
   const [wallet, setWallet] = useState<any>(null)
 
   useEffect(() => {
+    console.log("selectedWallet", selectedWallet)
     // Mock data - replace with actual API call
     if (selectedWallet) {
       setWallet({
         id: selectedWallet,
-        name: 'City Bank',
+        bankName: 'City Bank',
         type: 'Bank',
         balance: 5000,
+        currency: 'USD',
         personalFunds: 4000,
         creditLimit: 1000,
         accountNumber: '**** **** **** 1234',
@@ -79,27 +81,9 @@ export function WalletDetails({ selectedWallet }: WalletDetailsProps) {
             <p className="text-xs text-muted-foreground">+5% from last month</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
-            <PiggyBank className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${wallet.monthlySavings.toFixed(2)}</div>
-            <Progress value={(wallet.monthlySavings / wallet.savingsGoal) * 100} className="mt-2" />
-            <p className="text-xs text-muted-foreground mt-1">
-              {((wallet.monthlySavings / wallet.savingsGoal) * 100).toFixed(0)}% of ${wallet.savingsGoal} goal reached
-            </p>
-          </CardContent>
-        </Card>
+       
       </div>
 
-      <Tabs defaultValue="transfers" className="w-full">
-        <TabsList>
-          <TabsTrigger value="transfers">Transfers</TabsTrigger>
-          <TabsTrigger value="transactions">Transactions</TabsTrigger>
-        </TabsList>
-        <TabsContent value="transfers">
           <Card>
             <CardHeader>
               <CardTitle>Recent Transfers</CardTitle>
@@ -109,19 +93,7 @@ export function WalletDetails({ selectedWallet }: WalletDetailsProps) {
               <p>Transfer history will be displayed here</p>
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="transactions">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Add transaction history table here */}
-              <p>Transaction history will be displayed here</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        
     </div>
   )
 }

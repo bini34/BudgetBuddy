@@ -6,16 +6,16 @@ const savingsSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  category: {
+  name: {
     type: String,
-    required: true, // e.g., "Emergency Fund"
+    required: true, 
     trim: true,
   },
-  percentage: {
+  targetAmount: {
     type: Number,
-    required: true, // Percentage allocation (0-100)
+    default: 0, // Amount saved
   },
-  amount: {
+  savingsAmount: {
     type: Number,
     default: 0, // Amount saved
   },

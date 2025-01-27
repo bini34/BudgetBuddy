@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { Plus, Trash2 } from 'lucide-react'
-
+import { createBudget, getUserBudgets, addIncomeSource } from '../lib/budget';
 interface IncomeSource {
   id: string
   label: string
@@ -28,6 +28,20 @@ interface SavingsAllocation {
   percentage: number
 }
 
+interface BudgetData {
+  incomeSources: { name: string; amount: number }[];
+  expensePlanCategories: {
+    needs: { name: string; amount: number }[];
+    wants: { name: string; amount: number }[];
+    others: { name: string; amount: number }[];
+  };
+  savingsPlan: { name: string; percentage: number; amount: number }[];
+  month: {
+    year: number;
+    month: number;
+  };
+}
+
 export function BudgetSetupForm() {
   const [incomeSources, setIncomeSources] = useState<IncomeSource[]>([
     { id: '1', label: 'Salary', amount: 0 },
@@ -39,12 +53,12 @@ export function BudgetSetupForm() {
     { id: '4', name: 'Transport', type: 'needs', amount: 0 },
     { id: '5', name: 'Grocery', type: 'needs', amount: 0 },
     { id: '6', name: 'Books', type: 'wants', amount: 0 },
-    { id: '7', name: 'Fun money', type: 'wants', amount: 0 },
+    { id: '7', name: 'Fun money', type: 'wants', amount: 0 }
   ])
   const [savingsAllocations, setSavingsAllocations] = useState<SavingsAllocation[]>([
-    { id: '1', label: 'Emergency Fund', percentage: 50 },
-    { id: '2', label: 'Bank A', percentage: 30 },
-    { id: '3', label: 'Bank B', percentage: 20 },
+    { id: '1', label: 'needs', percentage: 50 },
+    { id: '2', label: 'wants', percentage: 30 },
+    { id: '3', label: 'savings', percentage: 20 },
   ])
   const { toast } = useToast()
 
@@ -86,14 +100,61 @@ export function BudgetSetupForm() {
     ))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    // Here you would typically save the budget data to your backend
-    toast({
-      title: "Budget saved",
-      description: "Your budget has been successfully updated.",
-    })
-  }
+  const prepareBudgetData = (): BudgetData => {
+    // Calculate savings amounts based on percentages
+    const savingsPlanWithAmounts = savingsAllocations.map(allocation => ({
+      name: allocation.label,
+      percentage: allocation.percentage,
+      amount: (totalSavings * allocation.percentage) / 100
+    }));
+
+    return {
+      incomeSources: incomeSources.map(source => ({
+        name: source.label,
+        amount: source.amount
+      })),
+      expensePlanCategories: {
+        needs: expenseCategories
+          .filter(cat => cat.type === 'needs')
+          .map(cat => ({ name: cat.name, amount: cat.amount })),
+        wants: expenseCategories
+          .filter(cat => cat.type === 'wants')
+          .map(cat => ({ name: cat.name, amount: cat.amount })),
+        others: expenseCategories
+          .filter(cat => cat.type === 'others')
+          .map(cat => ({ name: cat.name, amount: cat.amount }))
+      },
+      savingsPlan: savingsPlanWithAmounts,
+      month: {
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1
+      }
+    };
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const budgetData = prepareBudgetData();
+      console.log("budgetData", budgetData)
+      const response = await createBudget(budgetData);
+      if (!response.ok) {
+        throw new Error('Failed to save budget');
+      }
+
+      toast({
+        title: "Budget saved",
+        description: "Your budget has been successfully updated.",
+        variant: "success",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save budget. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <motion.form

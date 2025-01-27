@@ -5,14 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoanTable } from "@/components/LoanTable"
 import { PaymentSchedule } from "@/components/PaymentSchedule"
 import Layout from '@/components/layout'
-
+import { createLoan, getUserLoans, updateLoan } from '@/lib/loans'
 interface Loan {
   id: string
   lender: string
   amount: number
   interestRate: number
-  dueDate: string
-  status: 'Paid' | 'Unpaid'
+  payoffDate: string
 }
 
 interface Payment {
@@ -20,8 +19,7 @@ interface Payment {
   loanId: string
   lender: string
   amount: number
-  dueDate: string
-  status: 'Paid' | 'Unpaid'
+  payoffDate: string
 }
 
 export default function LoanTrackingPage() {
@@ -29,50 +27,45 @@ export default function LoanTrackingPage() {
   const [payments, setPayments] = useState<Payment[]>([])
 
   useEffect(() => {
-    fetch('/api/loans')
-      .then(response => response.json())
-      .then(data => {
-        setLoans(data)
-        // Generate payments based on loans
-        const generatedPayments = data.map((loan: Loan) => ({
-          id: `payment-${loan.id}`,
-          loanId: loan.id,
-          lender: loan.lender,
-          amount: loan.amount,
-          dueDate: loan.dueDate,
-          status: loan.status
-        }))
-        setPayments(generatedPayments)
-      })
-  }, [])
+    const fetchLoans = async () => {
+      const loans = await getUserLoans();
+      console.log("loans",loans)
+      setLoans(loans);
+      
+      // Generate payments based on loans
+      const generatedPayments = loans.map((loan: Loan) => ({
+        id: `payment-${loan.id}`,
+        loanId: loan.id,
+        lender: loan.lender,
+        amount: loan.amount,
+        payoffDate: loan.payoffDate,
+      }));
+      setPayments(generatedPayments);
+    };
+    
+    fetchLoans();
+  }, []);
 
   const handleAddLoan = async (newLoan: Omit<Loan, 'id'>) => {
-    const response = await fetch('/api/loans', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...newLoan, userId: '1' }) // Replace with actual user ID
-    })
+    const response = await createLoan(newLoan);
     const addedLoan = await response.json()
     setLoans([...loans, addedLoan])
     // Add corresponding payment
-    setPayments([...payments, {
-      id: `payment-${addedLoan.id}`,
-      loanId: addedLoan.id,
-      lender: addedLoan.lender,
-      amount: addedLoan.amount,
-      dueDate: addedLoan.dueDate,
-      status: 'Unpaid'
-    }])
+    // setPayments([...payments, {
+    //   id: `payment-${addedLoan.id}`,
+    //   loanId: addedLoan.id,
+    //   lender: addedLoan.lender,
+    //   amount: addedLoan.amount,
+    //   dueDate: addedLoan.dueDate,
+    //   status: 'Unpaid'
+    // }])
   }
 
   const handleUpdateLoanStatus = async (id: string, status: 'Paid' | 'Unpaid') => {
-    const response = await fetch('/api/loans', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status })
-    })
+    const response = await updateLoan(id, status);
     const updatedLoan = await response.json()
-    setLoans(loans.map(loan => 
+    
+    setLoans(loans.map((loan: typeof updatedLoan) => 
       loan.id === updatedLoan.id ? updatedLoan : loan
     ))
     // Update the corresponding payment status

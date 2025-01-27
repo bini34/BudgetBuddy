@@ -6,24 +6,23 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
+import { createWallet } from "@/lib/wallet"
 interface AddWalletModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
 export function AddWalletModal({ isOpen, onClose }: AddWalletModalProps) {
-  const [walletType, setWalletType] = useState('')
-  const [walletName, setWalletName] = useState('')
+  const [bankName, setBankName] = useState('')
+  const [accountNumber, setAccountNumber] = useState('')
   const [initialBalance, setInitialBalance] = useState('')
-  const [cardNumber, setCardNumber] = useState('')
-  const [holderName, setHolderName] = useState('')
-  const [expiryDate, setExpiryDate] = useState('')
+  const [currency, setCurrency] = useState('ETB')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission here
-    console.log({ walletType, walletName, initialBalance, cardNumber, holderName, expiryDate })
+
+    const response = await createWallet({ bankName, accountNumber, initialBalance, currency })
+    console.log("response", response)
     onClose()
   }
 
@@ -31,32 +30,45 @@ export function AddWalletModal({ isOpen, onClose }: AddWalletModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Wallet</DialogTitle>
+          <DialogTitle>Add New Bank Account</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="walletType">Wallet Type</Label>
-              <Select value={walletType} onValueChange={setWalletType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select wallet type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bank">Bank Account</SelectItem>
-                  <SelectItem value="debit">Debit Card</SelectItem>
-                  <SelectItem value="credit">Credit Card</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="bankName">Bank Name</Label>
+              <Input
+                id="bankName"
+                value={bankName}
+                onChange={(e) => setBankName(e.target.value)}
+                placeholder="Enter bank name"
+              />
             </div>
             <div>
-              <Label htmlFor="walletName">Wallet Name</Label>
+              <Label htmlFor="accountNumber">Account Number</Label>
               <Input
-                id="walletName"
-                value={walletName}
-                onChange={(e) => setWalletName(e.target.value)}
-                placeholder="Enter wallet name"
+                id="accountNumber"
+                value={accountNumber}
+                onChange={(e) => setAccountNumber(e.target.value)}
+                placeholder="Enter account number"
               />
+            </div>
+            <div>
+              <Label htmlFor="currency">Currency</Label>
+              <Select value={currency} onValueChange={setCurrency}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ETB">ETB - Ethiopian Birr</SelectItem>
+                  <SelectItem value="AED">AED - UAE Dirham</SelectItem>
+                  <SelectItem value="USD">USD - US Dollar</SelectItem>
+                  <SelectItem value="EUR">EUR - Euro</SelectItem>
+                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                  <SelectItem value="JPY">JPY - Japanese Yen</SelectItem>
+                  <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+                  <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="initialBalance">Initial Balance</Label>
@@ -68,40 +80,9 @@ export function AddWalletModal({ isOpen, onClose }: AddWalletModalProps) {
                 placeholder="Enter initial balance"
               />
             </div>
-            {(walletType === 'debit' || walletType === 'credit') && (
-              <>
-                <div>
-                  <Label htmlFor="cardNumber">Card Number</Label>
-                  <Input
-                    id="cardNumber"
-                    value={cardNumber}
-                    onChange={(e) => setCardNumber(e.target.value)}
-                    placeholder="Enter card number"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="holderName">Holder Name</Label>
-                  <Input
-                    id="holderName"
-                    value={holderName}
-                    onChange={(e) => setHolderName(e.target.value)}
-                    placeholder="Enter holder name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="expiryDate">Expiry Date</Label>
-                  <Input
-                    id="expiryDate"
-                    value={expiryDate}
-                    onChange={(e) => setExpiryDate(e.target.value)}
-                    placeholder="MM/YY"
-                  />
-                </div>
-              </>
-            )}
           </div>
           <DialogFooter className="mt-6">
-            <Button type="submit">Add Wallet</Button>
+            <Button type="submit">Add Bank Account</Button>
           </DialogFooter>
         </form>
       </DialogContent>

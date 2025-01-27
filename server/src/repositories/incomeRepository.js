@@ -25,6 +25,17 @@ class IncomeRepository {
     async delete(id) {
         return await Income.findByIdAndDelete(id);
     }
+
+    async findByYear(userId, year) {
+        try {
+            return await Income.find({
+                userId,
+                year
+            }).sort({ month: 1, createdAt: -1 });
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 module.exports = new IncomeRepository();

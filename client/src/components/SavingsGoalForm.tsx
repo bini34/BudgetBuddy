@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import { createSaving } from '@/lib/saving'
 
 interface SavingsGoal {
   id: string
@@ -23,21 +24,33 @@ export function SavingsGoalForm({ onAddGoal }: SavingsGoalFormProps) {
   const [targetAmount, setTargetAmount] = useState('')
   const { toast } = useToast()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const newGoal: SavingsGoal = {
-      id: Date.now().toString(),
-      name,
+    const newGoal = {
+      name ,
       targetAmount: parseFloat(targetAmount),
-      savedAmount: 0 // Initially set to 0
+      savingsAmount: 0
     }
-    onAddGoal(newGoal)
-    toast({
-      title: "Savings Goal Added",
-      description: `New goal "${name}" with target $${targetAmount} has been added.`,
-    })
-    setName('')
-    setTargetAmount('')
+    console.log("newGoal", newGoal)
+      const response = await createSaving({name: newGoal.name, targetAmount: newGoal.targetAmount, savingsAmount: newGoal.savingsAmount})
+      console.log("response from createSaving", response)
+      if (response.success) {
+      onAddGoal(response)
+      toast({
+        title: "Savings Goal Added",
+        description: `New goal "${name}" with target $${targetAmount} has been added.`,
+        variant: "success"
+      })
+     
+    } else {
+      toast({
+        title: "Error",
+        description: "Failed to add savings goal",
+        variant: "destructive"
+      })
+      setName('')
+      setTargetAmount('')
+    }
   }
 
   return (
@@ -74,4 +87,3 @@ export function SavingsGoalForm({ onAddGoal }: SavingsGoalFormProps) {
     </Card>
   )
 }
-

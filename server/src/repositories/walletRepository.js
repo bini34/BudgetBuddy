@@ -10,7 +10,7 @@ class WalletRepository {
   }
 
   async findByUser(userId) {
-    return await Wallet.find({ user: userId });
+    return await Wallet.find({ userId });
   }
 
   async findByAccountNumber(accountNumber) {

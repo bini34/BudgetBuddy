@@ -1,22 +1,25 @@
+import 'dotenv/config';
+import getCookie from './getcookie';
 async function Fetch(endpoint, method, body) {
-    try {
-        const response = await fetch(endpoint, {
+    const baseUrl = "http://localhost:5000/api/v1";
+    const url = `${baseUrl}${endpoint}`; 
+    
+    
+    const token = getCookie('token');
+    console.log("token", token);
+
+ 
+        const response = await fetch(url, {
             method: method,
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'accept': 'application/json',
             },
             body: JSON.stringify(body),
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        console.log("response", response);
         return await response.json();
-    } catch (error) {
-        console.error('Error in API request:', error);
-        throw error;
-    }
 }
 
 export default Fetch;

@@ -15,10 +15,9 @@ const loanSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  status: { 
-    type: String, 
-    enum: ['Pending', 'Approved', 'Paid'], 
-    default: 'Pending' 
+  interestRate: {
+    type: Number,
+    required: true,
   },
   payoffDate: {
     type: Date, // Loan repayment due date

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -13,22 +13,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CalendarIcon } from 'lucide-react'
 import { format } from "date-fns"
-import { cn } from "@/lib/utils"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { getBudgetSubcategories } from '@/lib/budget'
+import { createExpense } from '@/lib/expense'
+
+interface SubCategory {
+  id: string;
+  name: string;
+}
+
+interface CategoryData {
+  needs: SubCategory[];
+  wants: SubCategory[];
+  others: SubCategory[];
+}
 
 interface Expense {
-  id: string
   category: string
   subCategory: string
   amount: number
-  date: Date
+  month: number
+  year: number
   notes: string
 }
 
@@ -39,30 +44,69 @@ interface ExpenseFormProps {
 export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
   const [category, setCategory] = useState<string>("")
   const [subCategory, setSubCategory] = useState<string>("")
+  const [subCategoryId, setSubCategoryId] = useState<string>("")
   const [amount, setAmount] = useState<string>("")
-  const [date, setDate] = useState<Date>()
   const [notes, setNotes] = useState<string>("")
+  const [categoryData, setCategoryData] = useState<CategoryData | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch categories when component mounts
+  useEffect(() => {
+    async function fetchCategories() {
+      setIsLoading(true)
+      try {
+        const response = await getBudgetSubcategories()
+        if (response.success) {
+          setCategoryData(response.data)
+        } else {
+          console.error('Failed to fetch categories:', response.error)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  const handleSubCategoryChange = (value: string) => {
+    const [id, name] = value.split('|')
+    setSubCategory(name)
+    setSubCategoryId(id)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (category && subCategory && amount && date) {
+    if (category && subCategory && amount) {
+      const currentDate = new Date()
       const newExpense: Expense = {
-        id: Date.now().toString(),
         category,
         subCategory,
         amount: parseFloat(amount),
-        date,
-        notes
+        month: currentDate.getMonth() + 1,
+        year: currentDate.getFullYear(),
+        notes,
       }
-      onAddExpense(newExpense)
-      // Reset form
-      setCategory("")
-      setSubCategory("")
-      setAmount("")
-      setDate(undefined)
-      setNotes("")
+      console.log("newExpense", newExpense);
+      const response = await createExpense(newExpense)
+      console.log("response", response);
+      if (response.success) {
+        onAddExpense(newExpense)
+        // Reset form
+        setCategory("")
+        setSubCategory("")
+        setSubCategoryId("")
+        setAmount("")
+        setNotes("")
+      }
     }
   }
+
+  const currentSubCategories = categoryData?.[category as keyof CategoryData] || []
+  const currentDate = new Date()
+  const currentMonthYear = format(currentDate, "MMMM yyyy")
 
   return (
     <Card>
@@ -84,15 +128,30 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
               </SelectContent>
             </Select>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="subCategory">Sub-category</Label>
-            <Input
-              id="subCategory"
-              value={subCategory}
-              onChange={(e) => setSubCategory(e.target.value)}
-              placeholder="Enter sub-category"
-            />
+            <Select 
+              value={subCategoryId ? `${subCategoryId}|${subCategory}` : ''}
+              onValueChange={handleSubCategoryChange}
+              disabled={!category || isLoading}
+            >
+              <SelectTrigger id="subCategory">
+                <SelectValue placeholder={isLoading ? "Loading..." : "Select sub-category"} />
+              </SelectTrigger>
+              <SelectContent>
+                {currentSubCategories.map((subCat) => (
+                  <SelectItem 
+                    key={subCat.id} 
+                    value={`${subCat.id}|${subCat.name}`}
+                  >
+                    {subCat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="amount">Amount</Label>
             <Input
@@ -104,31 +163,14 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
               step="0.01"
             />
           </div>
+
           <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <Label>Date</Label>
+            <div className="p-2 border rounded-md text-sm text-muted-foreground">
+              {currentMonthYear}
+            </div>
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (optional)</Label>
             <Textarea
@@ -138,6 +180,7 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
               placeholder="Add any additional notes"
             />
           </div>
+          
           <Button type="submit" className="w-full">Add Expense</Button>
         </form>
       </CardContent>

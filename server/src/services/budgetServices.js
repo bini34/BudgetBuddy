@@ -90,6 +90,31 @@ class BudgetService {
         await this.getBudgetById(budgetId, userId);
         return await this.budgetRepository.deleteSavingsPlan(budgetId, savingsId);
     }
+
+    async getBudgetSubcategories(userId) {
+        try {
+            const categories = await this.budgetRepository.getBudgetSubcategories(userId);
+            
+            // Transform the data to a more frontend-friendly format
+            return {
+                needs: categories.needs.map(cat => ({
+                    id: cat._id,
+                    name: cat.name,
+                })),
+                wants: categories.wants.map(cat => ({
+                    id: cat._id,
+                    name: cat.name,
+                })),
+                others: categories.others.map(cat => ({
+                    id: cat._id,
+                    name: cat.name,
+                }))
+            };
+        } catch (error) {
+            console.error('Error in getBudgetSubcategories service:', error);
+            throw error;
+        }
+    }
 }
 
 const budgetRepository = require('../repositories/budgetRepository');

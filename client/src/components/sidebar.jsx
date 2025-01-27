@@ -45,7 +45,7 @@ export function AppSidebar({
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <Link href="/expense" className={isSelected('/expense')}>
+            <Link href="/expenses" className={isSelected('/expense')}>
               <CreditCard className="mr-2 h-6 w-6" />
               <span className="text-md">Expense Tracking</span> 
             </Link>

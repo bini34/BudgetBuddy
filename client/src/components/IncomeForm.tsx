@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-
+import { addIncome } from '@/lib/income'
 interface IncomeEntry {
   id: string
   source: string
   amount: number
-  date: string
+  month: number
+  year: number
 }
 
 interface IncomeFormProps {
@@ -21,21 +22,33 @@ interface IncomeFormProps {
 export function IncomeForm({ onAddIncome }: IncomeFormProps) {
   const [source, setSource] = useState('')
   const [amount, setAmount] = useState('')
+  const [month, setMonth] = useState(new Date().getMonth() + 1)
+  const [year, setYear] = useState(new Date().getFullYear())
   const { toast } = useToast()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const newIncome: IncomeEntry = {
       id: Date.now().toString(),
       source,
       amount: parseFloat(amount),
-      date: new Date().toISOString().split('T')[0] // Current date
+      month: month,
+      year: year
     }
-    onAddIncome(newIncome)
-    toast({
-      title: "Income added",
-      description: `$${amount} from ${source} has been logged.`,
-    })
+    const response = await addIncome({
+        source: newIncome.source,
+        amount: newIncome.amount,
+        month: newIncome.month,
+        year: newIncome.year
+    });
+    if (response.success) {
+      onAddIncome(newIncome)
+      toast({
+        title: "Income added",
+        description: `$${amount} from ${source} has been logged.`,
+        variant: "success"
+      })
+    }
     setSource('')
     setAmount('')
   }

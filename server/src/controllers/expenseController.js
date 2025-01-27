@@ -7,7 +7,6 @@ class ExpenseController {
         try {
             const expenseData = {
                 ...req.body,
-                userId: req.user._id // Assuming you have user data from auth middleware
             };
             const expense = await expenseService.createExpense(expenseData);
             return apiResponse.created(res, expense, 'Expense created successfully');
@@ -19,7 +18,6 @@ class ExpenseController {
     // Get all expenses
     async getAllExpenses(req, res) {
         try {
-            const userId = req.user._id; // Assuming you have user data from auth middleware
             const expenses = await expenseService.getAllExpenses(userId);
             return apiResponse.success(res, expenses, 'Expenses retrieved successfully');
         } catch (error) {
@@ -62,6 +60,22 @@ class ExpenseController {
             if (error.message === 'Expense not found') {
                 return apiResponse.notFound(res, error.message);
             }
+            return apiResponse.error(res, error.message);
+        }
+    }
+
+    // Get expenses by filters
+    async getExpensesByFilters(req, res) {
+        try {
+            const filters = {
+                userId: req.query.userId,
+                category: req.query.category,
+                subCategory: req.query.subCategory
+            };
+            
+            const expenses = await expenseService.getExpensesByFilters(filters);
+            return apiResponse.success(res, expenses, 'Filtered expenses retrieved successfully');
+        } catch (error) {
             return apiResponse.error(res, error.message);
         }
     }

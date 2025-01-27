@@ -2,6 +2,7 @@ const Expense = require('../models/expenseModel');
 
 class ExpenseRepository {
     async create(expenseData) {
+        console.log("expenseData", expenseData);
         const expense = new Expense(expenseData);
         return await expense.save();
     }
@@ -24,6 +25,16 @@ class ExpenseRepository {
 
     async delete(id) {
         return await Expense.findByIdAndDelete(id);
+    }
+
+    async findByFilters(filters) {
+        try {
+            const expenses = await Expense.find(filters)
+                .sort({ createdAt: -1 });
+            return expenses;
+        } catch (error) {
+            throw error;
+        }
     }
 }
 

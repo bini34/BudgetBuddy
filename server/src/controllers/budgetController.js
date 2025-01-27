@@ -174,6 +174,23 @@ class BudgetController {
             return apiResponse.error(res, error.message);
         }
     }
+
+    async getBudgetSubcategories(req, res) {
+        try {
+            const { userId } = req.params;
+            
+            // Ensure user can only access their own data
+            // if (req.user.id !== userId) {
+            //     return apiResponse.forbidden(res, 'You are not authorized to access this resource');
+            // }
+
+            const categories = await budgetService.getBudgetSubcategories(userId);
+            return apiResponse.success(res, categories, 'Budget subcategories retrieved successfully');
+        } catch (error) {
+            console.error('Error in getBudgetSubcategories controller:', error);
+            return apiResponse.error(res, 'Failed to retrieve budget subcategories');
+        }
+    }
 }
 
 module.exports = new BudgetController();

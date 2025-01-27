@@ -1,11 +1,13 @@
 "use client"
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { signInUser } from "@/lib/auth";
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { AuthContext } from "@/context/AuthContext";
 import Link from "next/link"
+import { redirect } from "next/navigation";
 
 export function LoginForm({
   className,
@@ -13,16 +15,23 @@ export function LoginForm({
 }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login, getUser } = useContext(AuthContext);
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log("email", email, "password", password);
-    // try {
-    //   const response = await signInUser(email, password);
-    //   // Handle successful login, e.g., redirect or show a success message
-    // } catch (error) {
-    //   // Handle error, e.g., show an error message
-    // }
+      const response = await signInUser(email, password);
+      console.log("response in login form", response);
+      if (response.success) {
+        console.log("response.data.user", response.data.user.user);
+        login(response.data.user.user, response.data.token);
+        const user = getUser();
+        console.log("user from getUser", user.id);
+        redirect('/dashboard');
+      }else {
+        console.log("error in login form", response);
+      }
   };
 
   return (

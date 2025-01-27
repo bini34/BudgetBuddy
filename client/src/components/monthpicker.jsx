@@ -39,7 +39,12 @@ function MonthPicker({
     ...props
 }) {
     return (
-        <div className={cn("w-[200px] sm:w-[250px] md:w-[280px] p-3", className)} {...props}>
+        <div 
+            className={cn("w-[200px] sm:w-[250px] md:w-[280px] p-3", className)} 
+            role="dialog"
+            aria-label="Month picker"
+            {...props}
+        >
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0">
                 <div className="space-y-4 w-full">
                     <MonthCal
@@ -52,7 +57,7 @@ function MonthPicker({
                         minDate={minDate}
                         maxDate={maxDate}
                         disabledDates={disabledDates}
-                    ></MonthCal>
+                    />
                 </div>
             </div>
         </div>
@@ -73,7 +78,9 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
     return (
         <>
             <div className="flex justify-center pt-1 relative items-center">
-                <div className="text-sm font-medium">{callbacks?.yearLabel ? callbacks?.yearLabel(menuYear) : menuYear}</div>
+                <div className="text-sm font-medium" role="heading" aria-label={`Year ${menuYear}`}>
+                    {callbacks?.yearLabel ? callbacks?.yearLabel(menuYear) : menuYear}
+                </div>
                 <div className="space-x-1 flex items-center">
                     <button
                         onClick={() => {
@@ -81,6 +88,7 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
                             if (onYearBackward) onYearBackward();
                         }}
                         className={cn(buttonVariants({ variant: variant?.chevrons ?? "outline" }), "inline-flex items-center justify-center h-7 w-7 p-0 absolute left-1")}
+                        aria-label="Previous year"
                     >
                         <ChevronLeft className="opacity-50 h-4 w-4" />
                     </button>
@@ -90,21 +98,23 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
                             if (onYearForward) onYearForward();
                         }}
                         className={cn(buttonVariants({ variant: variant?.chevrons ?? "outline" }), "inline-flex items-center justify-center h-7 w-7 p-0 absolute right-1")}
+                        aria-label="Next year"
                     >
                         <ChevronRight className="opacity-50 h-4 w-4" />
                     </button>
                 </div>
             </div>
-            <table className="w-full border-collapse space-y-1">
+            <table className="w-full border-collapse space-y-1" role="grid">
                 <tbody>
                     {MONTHS.map((monthRow, a) => {
                         return (
-                            <tr key={"row-" + a} className="flex w-full mt-2">
+                            <tr key={"row-" + a} className="flex w-full mt-2" role="row">
                                 {monthRow.map((m) => {
                                     return (
                                         <td
                                             key={m.number}
                                             className="h-10 w-1/4 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20"
+                                            role="gridcell"
                                         >
                                             <button
                                                 onClick={() => {
@@ -121,6 +131,8 @@ function MonthCal({ selectedMonth, onMonthSelect, callbacks, variant, minDate, m
                                                     buttonVariants({ variant: month == m.number && menuYear == year ? variant?.calendar?.selected ?? "default" : variant?.calendar?.main ?? "ghost" }),
                                                     "h-full w-full p-0 font-normal aria-selected:opacity-100"
                                                 )}
+                                                aria-selected={month == m.number && menuYear == year}
+                                                aria-label={`${m.name} ${menuYear}`}
                                             >
                                                 {callbacks?.monthLabel ? callbacks.monthLabel(m) : m.name}
                                             </button>

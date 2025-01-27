@@ -1,8 +1,8 @@
 "use client"
-
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-
+import { getAllSavings } from '@/lib/saving'
 interface SavingsGoal {
   id: string
   name: string
@@ -16,6 +16,12 @@ interface SavingsGoalProgressProps {
 }
 
 export function SavingsGoalProgress({ goals, onUpdateSavedAmount }: SavingsGoalProgressProps) {
+  const [savingsGoals, setSavingsGoals] = useState(goals)
+
+  useEffect(() => {
+    setSavingsGoals(goals)
+  }, [goals])
+
   const handleSavedAmountChange = (id: string, amount: string) => {
     const parsedAmount = parseFloat(amount)
     if (!isNaN(parsedAmount)) {
@@ -30,7 +36,7 @@ export function SavingsGoalProgress({ goals, onUpdateSavedAmount }: SavingsGoalP
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {goals.map((goal) => {
+          {goals.length > 0 && goals.map((goal) => {
             const percentage = (goal.savedAmount / goal.targetAmount) * 100
             return (
               <div key={goal.id} className="space-y-2">

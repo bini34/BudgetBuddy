@@ -4,16 +4,18 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { Eye, EyeClosed } from "lucide-react"
 import { registerUser } from "@/lib/auth"
-
+import { AuthContext } from "@/context/AuthContext";
+import { redirect } from "next/navigation";
 export function RegisterForm({
   className,
   ...props
 }) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const { login } = useContext(AuthContext);
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -25,7 +27,6 @@ export function RegisterForm({
   const handleSubmit = async (event) => {
     console.log("firstName", firstName, "lastName", lastName, "email", email, "password", password, "confirmPassword", confirmPassword);
     event.preventDefault();
-    try {
       const data = await registerUser({
         firstName,
         lastName,
@@ -34,11 +35,14 @@ export function RegisterForm({
         confirmPassword
       });
       console.log(data);
+      if (data.success) {
+        login(data.data.user, data.data.token);
+        redirect('/dashboard');
+
+      } else {
+        // Handle error, e.g., show an error message
+      }
       // Handle successful registration, e.g., redirect or show a success message
-    } catch (error) {
-      console.log(error);
-      // Handle error, e.g., show an error message
-    }
   };
 
   return (

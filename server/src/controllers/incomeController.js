@@ -7,7 +7,6 @@ class IncomeController {
         try {
             const incomeData = {
                 ...req.body,
-                userId: req.user._id // Assuming you have user data from auth middleware
             };
             const income = await incomeService.createIncome(incomeData);
             return apiResponse.created(res, income, 'Income added successfully');
@@ -65,6 +64,23 @@ class IncomeController {
             if (error.message === 'Income not found') {
                 return apiResponse.notFound(res, error.message);
             }
+            return apiResponse.error(res, error.message);
+        }
+    }
+
+    async getIncomeByYear(req, res) {
+        try {
+            const { userId, year } = req.params;
+            const yearlyIncome = await incomeService.getIncomeByYear(
+                userId, 
+                parseInt(year)
+            );
+            return apiResponse.success(
+                res, 
+                yearlyIncome, 
+                'Yearly income retrieved successfully'
+            );
+        } catch (error) {
             return apiResponse.error(res, error.message);
         }
     }

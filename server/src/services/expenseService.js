@@ -36,6 +36,72 @@ class ExpenseService {
         }
         return expense;
     }
+
+    async getExpensesByFilters(filters) {
+        try {
+            const { userId, category, subCategory } = filters;
+
+            console.log("filters", filters);
+
+            if (!userId) {
+                throw new Error('User ID is required');
+            }
+
+            const queryFilters = {
+                userId,
+            };
+
+            if (category && category !== 'all') {
+                queryFilters.category = category;
+            }
+
+            if (subCategory && subCategory !== 'all') {
+                queryFilters.subCategory = subCategory;
+            }
+
+            const expenses = await this.expenseRepository.findByFilters(queryFilters);
+            console.log("expenses from service of expenseService", expenses);
+            // Group expenses by category and subcategory
+            const groupedExpenses = this.groupExpensesByCategoryAndSubCategory(expenses);
+
+            return groupedExpenses;
+
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    groupExpensesByCategoryAndSubCategory(expenses) {
+        const groupedData = {};
+
+        expenses.forEach(expense => {
+            if (!groupedData[expense.category]) {
+                groupedData[expense.category] = {
+                    category: expense.category,
+                    totalAmount: 0,
+                    subCategories: {}
+                };
+            }
+
+            if (!groupedData[expense.category].subCategories[expense.subCategory]) {
+                groupedData[expense.category].subCategories[expense.subCategory] = {
+                    name: expense.subCategory,
+                    expenses: [],
+                    totalAmount: 0
+                };
+            }
+
+            groupedData[expense.category].subCategories[expense.subCategory].expenses.push(expense);
+            groupedData[expense.category].subCategories[expense.subCategory].totalAmount += expense.amount;
+            groupedData[expense.category].totalAmount += expense.amount;
+        });
+
+        // Convert to array format
+        return Object.values(groupedData).map(category => ({
+            ...category,
+            subCategories: Object.values(category.subCategories)
+        }));
+    }
 }
 
 module.exports = new ExpenseService();

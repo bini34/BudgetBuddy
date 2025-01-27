@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { SavingsGoalForm } from "@/components/SavingsGoalForm"
 import { SavingsGoalProgress } from "@/components/SavingsGoalProgress"
-
+import { getAllSavings, updateSaving } from '@/lib/saving'
 interface SavingsGoal {
   id: string
   name: string
@@ -17,50 +17,30 @@ export default function Page(){
   const [savingsGoals, setSavingsGoals] = useState<SavingsGoal[]>([])
 
   useEffect(() => {
-    fetch('/api/savings')
-      .then(response => response.json())
-      .then(data => setSavingsGoals(data))
-  }, [])
+    const fetchSavingsGoals = async () => {
+      const goals = await getAllSavings();
+      setSavingsGoals(goals);
+    };
+    fetchSavingsGoals();
+  }, []);
 
-  const handleAddGoal = async (newGoal: Omit<SavingsGoal, 'id'>) => {
-    const response = await fetch('/api/savings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...newGoal, userId: '1' }) // Replace with actual user ID
-    })
-    const addedGoal = await response.json()
+  const handleAddGoal = async (newGoal: SavingsGoal) => {
+
+  
+
     setSavingsGoals([...savingsGoals, addedGoal])
   }
 
   const handleUpdateSavedAmount = async (id: string, amount: number) => {
-    const response = await fetch('/api/savings', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, savedAmount: amount })
-    })
-    const updatedGoal = await response.json()
+    const updatedGoal = await updateSaving(id, amount);
     setSavingsGoals(savingsGoals.map(goal => 
       goal.id === updatedGoal.id ? updatedGoal : goal
     ))
   }
 
-  const totalSavings = savingsGoals.reduce((total, goal) => total + goal.savedAmount, 0)
+  const totalSavings = savingsGoals.length > 0 ? savingsGoals.reduce((total, goal) => total + goal.savingsAmount, 0) : 0
     return <Layout>
           <Header headerName="Saving" link="/saving" linkName="Saving" />
-
-          <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Monthly Savings Goals</h1>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${totalSavings.toFixed(2)}</div>
-          </CardContent>
-        </Card>
-      </div>
-
       <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-8">
           <SavingsGoalForm onAddGoal={handleAddGoal} />
@@ -76,6 +56,5 @@ export default function Page(){
         </div>
         <SavingsGoalProgress goals={savingsGoals} onUpdateSavedAmount={handleUpdateSavedAmount} />
       </div>
-    </div>
     </Layout>
 }

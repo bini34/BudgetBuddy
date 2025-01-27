@@ -107,6 +107,32 @@ class BudgetRepository {
             { new: true }
         );
     }
+
+    async getBudgetSubcategories(userId) {
+        try {
+            const budget = await Budget.findOne(
+                { userId: userId },
+                {
+                    'expensePlanCategories.needs': 1,
+                    'expensePlanCategories.wants': 1,
+                    'expensePlanCategories.others': 1
+                }
+            );
+
+            if (!budget) {
+                return {
+                    needs: [],
+                    wants: [],
+                    others: []
+                };
+            }
+
+            return budget.expensePlanCategories;
+        } catch (error) {
+            console.error('Error in getBudgetSubcategories repository:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = new BudgetRepository();

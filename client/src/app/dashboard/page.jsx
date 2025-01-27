@@ -1,3 +1,5 @@
+"use client"
+import { useState, useEffect } from "react";
 import { CardDashboard } from "@/components/carddashboard";
 import {  DollarSign, CreditCard, PiggyBank, PieChart } from 'lucide-react';
 import { AreaChartComponent } from "@/components/areachart";
@@ -6,32 +8,18 @@ import Layout from "@/components/layout";
 import BarChart  from "@/components/barChart";
 import MonthlyBreakdown from "@/components/monthlyBreakdown";
 import Header from "@/components/header";
-
+import { getDashboardCards } from "@/lib/report";
 export default function Page() {
-const cardDashboard = 
-  [
-    {
-      icon: <DollarSign />,
-      title: "Income",
-      value: "$45,231.89"
-    },
-    {
-      icon: <CreditCard />,
-      title: "Expenses",
-      value: "$45,231.89"
-    },
-    {
-      icon: <PiggyBank />,
-      title: "Savings",
-      value: "$45,231.89"
-    },
-    {
-      icon: <PieChart />,
-      title: "Remaining Budget",
-      value: "$45,231.89"
-    }
-  ]
-
+  const [cardDashboard, setCardDashboard] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async () => { 
+      const response = await getDashboardCards();
+      console.log("response dashboard", response);
+      setCardDashboard(response.data);
+    };
+    fetchData();
+  }, []);
   return (
        <Layout>
           <Header headerName="Dashboard" link="/dashboard" linkName="dashboard" />
